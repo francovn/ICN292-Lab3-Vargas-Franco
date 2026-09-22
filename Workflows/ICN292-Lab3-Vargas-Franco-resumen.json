@@ -1,0 +1,459 @@
+{
+  "name": "ICN292-Lab3-Vargas-Franco-resumen",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 20
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -240,
+        320
+      ],
+      "id": "e7da41e1-e685-4123-9f62-82503a6d76bb",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "SPdBS9XCgvxk7glJ",
+          "mode": "list",
+          "cachedResultName": "registro_solicitudes",
+          "cachedResultUrl": "/projects/SVDjjBH3m2Pzbk7C/datatables/SPdBS9XCgvxk7glJ"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "createdAt",
+              "condition": "gte",
+              "keyValue": "={{ $today.toISO() }}"
+            },
+            {
+              "keyName": "createdAt",
+              "condition": "lt",
+              "keyValue": "={{ $today.plus({ days: 1 }).toISO() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        320
+      ],
+      "id": "4c0c2875-0b50-4349-9ae8-f8bbce2fca3f",
+      "name": "Get row(s)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "811382be-97ad-4bb9-a216-1e5af20f9344",
+              "name": "mensaje",
+              "value": "=Resumen diario de solicitudes\n\nTotal de solicitudes: {{ $('SUMMARIZE_TOTAL').first().json.count_id_solicitud }}\n\nAPROBACION\nCantidad: {{ $('SUMMARIZE_POR_RUTA').all().find(i => i.json.ruta === 'APROBACION')?.json.count_id_solicitud ?? 0 }}\nMonto total: ${{ $('SUMMARIZE_POR_RUTA').all().find(i => i.json.ruta === 'APROBACION')?.json.sum_monto ?? 0 }}\n\nREVISION\nCantidad: {{ $('SUMMARIZE_POR_RUTA').all().find(i => i.json.ruta === 'REVISION')?.json.count_id_solicitud ?? 0 }}\nMonto total: ${{ $('SUMMARIZE_POR_RUTA').all().find(i => i.json.ruta === 'REVISION')?.json.sum_monto ?? 0 }}\n\nRECHAZO\nCantidad: {{ $('SUMMARIZE_POR_RUTA').all().find(i => i.json.ruta === 'RECHAZO')?.json.count_id_solicitud ?? 0 }}\nMonto total: ${{ $('SUMMARIZE_POR_RUTA').all().find(i => i.json.ruta === 'RECHAZO')?.json.sum_monto ?? 0 }}\n\nDATOS_INVALIDOS\nCantidad: {{ $('SUMMARIZE_POR_RUTA').all().find(i => i.json.ruta === 'DATOS_INVALIDOS')?.json.count_id_solicitud ?? 0 }}\nMonto total: ${{ $('SUMMARIZE_POR_RUTA').all().find(i => i.json.ruta === 'DATOS_INVALIDOS')?.json.sum_monto ?? 0 }}\n\nMonto total del día: ${{ $('SUMMARIZE_TOTAL').first().json.sum_monto }}\n\nTasa de aprobación automátic: {{ $json['tasa_aprobación'] }}  %",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1328,
+        320
+      ],
+      "id": "75904e35-e48b-4399-babf-d0e3741896bf",
+      "name": "RESUMEN"
+    },
+    {
+      "parameters": {
+        "fromEmail": "andeshogarbasedatos@example.com",
+        "toEmail": "andeshogarfinanzas@example.com",
+        "subject": "Resumen diario devoluviones",
+        "html": "={{ $json.mensaje }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1568,
+        480
+      ],
+      "id": "246054fd-ac80-4a1d-8d3d-2100bffc40c7",
+      "name": "Send an Email",
+      "webhookId": "a861bc88-9d95-40a8-9839-323f76c500d8",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "id_solicitud"
+            },
+            {
+              "aggregation": "sum",
+              "field": "monto"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "ruta",
+        "options": {
+          "outputFormat": "separateItems"
+        }
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        80
+      ],
+      "id": "f45af261-1ce3-4bd6-becb-00ac9588bfac",
+      "name": "SUMMARIZE_POR_RUTA"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "id_solicitud"
+            },
+            {
+              "aggregation": "sum",
+              "field": "monto"
+            }
+          ]
+        },
+        "options": {
+          "outputFormat": "separateItems"
+        }
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        656,
+        224
+      ],
+      "id": "c0234f7f-8908-419a-8673-969cfa8e5646",
+      "name": "SUMMARIZE_TOTAL"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "27ee91be-b43a-4322-ac97-fcba1e9f01ac",
+              "leftValue": "={{ $json.ruta }}",
+              "rightValue": "APROBACION",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        432,
+        416
+      ],
+      "id": "52b99858-0fdf-4b43-a68c-227413d236fd",
+      "name": "Filter",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        880,
+        320
+      ],
+      "id": "a27b989b-4016-4264-a3b5-cb623e7b02ce",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "id_solicitud"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        656,
+        416
+      ],
+      "id": "163a85d7-c24e-42b2-92a6-a7b738c16359",
+      "name": "SUMMARIZE_APROBACION",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f68bc5fa-2569-4a1a-83eb-5a3b55990617",
+              "name": "tasa_aprobación",
+              "value": "={{ Number(((Number($('SUMMARIZE_APROBACION').first().json.count_id_solicitud ?? 0) / Number($('SUMMARIZE_TOTAL').first().json.count_id_solicitud || 1)) * 100).toFixed(2)) }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1104,
+        320
+      ],
+      "id": "cbc5cda7-af74-4f64-ba90-980c2cc76368",
+      "name": "TASA_APROBACION",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8b0d96ff-65ff-4731-b1b5-4e7b4abaf8b7",
+              "leftValue": "={{ $json.id_solicitud }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        320
+      ],
+      "id": "d908775f-e463-4e24-b257-a40c17a54b31",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6003ae72-b8a9-4dee-8678-83dc8d1694cb",
+              "name": "mensaje",
+              "value": "No se procesaron solicitudes de devolución durante el día.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        432,
+        608
+      ],
+      "id": "a102f560-576e-4abc-9d3d-3602ae30ec10",
+      "name": "SIN_SOLICITUDES"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RESUMEN": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Email": {
+      "main": [
+        []
+      ]
+    },
+    "SUMMARIZE_POR_RUTA": {
+      "main": [
+        []
+      ]
+    },
+    "SUMMARIZE_TOTAL": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "SUMMARIZE_APROBACION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "TASA_APROBACION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SUMMARIZE_APROBACION": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "TASA_APROBACION": {
+      "main": [
+        [
+          {
+            "node": "RESUMEN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "SUMMARIZE_POR_RUTA",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SUMMARIZE_TOTAL",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SIN_SOLICITUDES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIN_SOLICITUDES": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ddc43496-63bb-49e1-afa8-ea6c3217419a",
+  "meta": {
+    "instanceId": "60db4917c41eb441661b7a1d2f8787a821b7580b8da1f918ffe7582cb2054212"
+  },
+  "nodeGroups": [],
+  "id": "zGdiHNhROIL3nf9V",
+  "tags": []
+}
