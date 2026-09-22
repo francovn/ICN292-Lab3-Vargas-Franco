@@ -1,0 +1,499 @@
+\documentclass[12pt,a4paper]{article}
+
+% ---------------- PAQUETES ----------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{helvet}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{datetime}
+\usepackage{url}
+\newdateformat{monthyeardate}{
+  \monthname[\THEMONTH], \THEYEAR}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+% ---------------- MÁRGENES ----------------
+\geometry{
+    top=2cm,
+    bottom=2cm,
+    left=2cm,
+    right=2cm
+}
+
+% ==========================================
+% ENCABEZADO PÁGINAS 2 EN ADELANTE
+% ==========================================
+
+\pagestyle{fancy}
+\fancyhf{}
+
+\fancyhead[L]{
+    \includegraphics[width=4.5cm]{logo usm.png}
+}
+
+\fancyhead[R]{
+    \begin{minipage}[b]{0.55\textwidth}
+        \raggedleft
+        {\small\textbf{Departamento de Industrias}}\\[-0.5mm]
+        {\small ICN-292 -- Sistemas de Información para la Gestión}
+    \end{minipage}
+}
+
+\renewcommand{\headrulewidth}{0.5pt}
+
+\setlength{\headheight}{38pt}
+\setlength{\headsep}{18pt}
+
+% =======================================
+% PIE DE PÁGINA PÁGINAS 2 EN ADELANTE
+% =======================================
+\setlength{\footskip}{20pt}
+\fancyfoot[L]{\small ICN-292}
+\fancyfoot[C]{\small \thepage}
+\fancyfoot[R]{\small Vargas}
+
+\renewcommand{\footrulewidth}{0.5pt}
+
+% ==========================================
+% INICIO DEL DOCUMENTO
+% ==========================================
+
+\begin{document}
+
+
+% ==========================================
+% PRIMERA PÁGINA / PORTADA
+% ==========================================
+
+\begin{titlepage}
+
+% Evita que aparezca el encabezado fancy en la portada
+\thispagestyle{empty}
+
+
+% ==========================================
+% LOGO ESPECIAL DE LA PRIMERA PÁGINA
+% ==========================================
+
+\vspace*{1.2cm}
+
+\noindent
+\includegraphics[width=5.5cm]{Logo usm portada.png}
+
+
+\vspace{4.5cm}
+
+
+% ==========================================
+% LÍNEA SUPERIOR
+% ==========================================
+
+\noindent\rule{\textwidth}{0.6pt}
+
+\vspace{0.15cm}
+
+
+% ==========================================
+% TÍTULO PRINCIPAL
+% ==========================================
+
+\begin{center}
+
+{\fontsize{12}{14}\selectfont
+\textbf{INFORME DE LABORATORIO}}
+
+\vspace{0.15cm}
+
+{\fontsize{18}{20}\selectfont
+\bfseries Laboratorio 3}
+
+\vspace{0.15cm}
+
+{\fontsize{15}{17}\selectfont
+\bfseries Automatización de procesos con n8n}
+
+\vspace{0.35cm}
+
+{\fontsize{13}{15}\selectfont
+\textsc{
+ICN-292 --- Sistemas de Información para la Gestión\\
+Segundo Semestre 2026
+}}
+
+\end{center}
+
+
+\vspace{0.10cm}
+
+
+% ==========================================
+% LÍNEA INFERIOR
+% ==========================================
+
+\noindent\rule{\textwidth}{0.6pt}
+
+\vspace{0.65cm}
+
+
+% ==========================================
+% INTEGRANTE
+% ==========================================
+
+\begin{center}
+
+\textbf{Franco Vargas Nieto}\\
+
+{\small
+Ingeniería Civil Industrial, 202360559-k,
+\textit{fvargasn@usm.cl}
+}
+
+\vspace{1cm} 
+
+Parámetros del laboratorio:
+\[S = [\text{654}]\]
+\[ U = \$34.000\]
+\[D = 21\ \text{días}\]
+
+\vspace{1cm} 
+
+\url{https://github.com/francovn/ICN292-Lab3-Vargas-Franco} 
+
+\end{center}
+
+
+\vfill
+
+
+% ==========================================
+% FECHA Y CAMPUS
+% ==========================================
+
+\begin{center}
+
+\textsc{\monthyeardate\today}
+
+\vspace{0.6cm}
+
+{\small\textsc{Campus Vitacura}}
+
+\vspace{1cm}
+
+\end{center}
+
+\end{titlepage}
+
+\newpage
+
+\section{Resumen ejecutivo}
+
+\noindent El presente laboratorio tiene como objetivo desarrollar un sistema de automatización para el proceso de devoluciones de AndesHogar, utilizando la plataforma n8n. Para ello, se implementó un flujo de trabajo que permite recibir solicitudes, evaluar las reglas de negocio y clasificar cada caso según el monto de compra, los días transcurridos desde la compra y el estado del producto.
+\\\\
+\noindent El sistema considera cuatro posibles resultados: aprobación automática, rechazo, revisión y datos inválidos. Adicionalmente, se incorporó una consulta externa para obtener el valor de la UF, permitiendo expresar los montos en dicha unidad, registrar las solicitudes procesadas y generar un resumen diario con los principales indicadores del proceso.
+\\\\
+\noindent Para comprobar su funcionamiento, se procesaron las 15  solicitudes del laboratorio y se realizaron pruebas adicionales con entradas inválidas, valores límite y errores de tipo de dato. Los resultados permitieron comprobar el comportamiento de las reglas
+implementadas, identificando que las solicitudes cuyos montos y plazos son exactamente iguales a los umbrales establecidos continúan dentro de lo permitido.
+\\\\
+\noindent Por otra parte, las pruebas permitieron identificar limitaciones relacionadas con la validación de los datos recibidos. En particular, los montos expresados mediante texto no numérico provocan errores de conversión, mientras que una comparación textual entre montos puede generar una clasificación incorrecta. Asimismo, se comprobó que una solicitud con un SKU inexistente puede ser aprobada, debido a que el flujo no verifica la existencia del producto en el catálogo.
+\\\\
+\noindent En consecuencia, el sistema desarrollado permite automatizar la recepción, clasificación y registro de solicitudes de devolución de acuerdo con las reglas implementadas. Sin embargo, antes de utilizarlo en un entorno de producción, sería necesario incorporar validaciones
+adicionales de los datos y productos, junto con mecanismos de control de errores que permitan asegurar un procesamiento adecuado de las solicitudes.
+\\\\
+\noindent Los archivos de los workflows implementados, junto con las evidencias de ejecución y los resultados obtenidos durante el laboratorio, se encuentran disponibles en el siguiente repositorio de GitHub: \ \url{https://github.com/francovn/ICN292-Lab3-Vargas-Franco}
+
+\newpage
+
+\section{Desarrollo del laboratorio}
+
+\subsection{Configuración del flujo de trabajo}
+
+\noindent Para desarrollar el laboratorio se implementó un workflow principal denominado TRIAGE, encargado de recibir las solicitudes de devolución y determinar la ruta correspondiente según las reglas de negocio.
+\\\\
+\noindent El proceso comienza mediante un nodo Webhook, el cual recibe los datos enviados desde un segundo workflow denominado EMISOR. Posteriormente, la información es evaluada mediante un nodo Switch, que determina la clasificación de cada solicitud.
+\\\\
+\noindent Las diferentes salidas del Switch se conectan con nodos de asignación de datos, permitiendo registrar la ruta y el motivo correspondiente. Estas ramas se concentran posteriormente en el nodo DECISION\_CONSOLIDADA.
+\\\\
+\noindent A continuación, el flujo consulta el valor de la UF mediante un servicio externo y calcula el monto equivalente de la solicitud. Finalmente, la información es almacenada y se genera una respuesta mediante el nodo Respond to Webhook.
+\\\\
+\noindent La siguiente figura presenta la estructura del workflow principal implementado en n8n:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Estructura.png}
+    \caption{Estructura del workflow principal}
+    \label{fig:placeholder}
+\end{figure}
+
+\section{Resultados de las solicitudes}
+
+
+\subsection{Procesamiento de las 15 solicitudes}
+
+\noindent Para el desarrollo de la Parte A, se procesaron las 15 solicitudes proporcionadas en el laboratorio mediante el workflow EMISOR, el cual envía los datos al Webhook del flujo principal utilizando el método POST.
+\\\\
+\noindent Para cada solicitud se registró el monto, los días transcurridos desde la compra, el estado del producto y la clasificación obtenida mediante las reglas de negocio.
+\\\\
+\noindent La siguiente tabla presenta los resultados
+del procesamiento de las solicitudes.
+
+\begin{table}[H]
+\centering
+\label{tab:solicitudes}
+\vspace{0.3cm}
+\footnotesize
+\begin{tabularx}{\textwidth}{l r r X X X}
+\toprule
+\textbf{id\_solicitud} & \textbf{monto} & \textbf{dias\_compra} & \textbf{estado\_producto} & \textbf{ruta} & \textbf{motivo} \\
+\midrule
+DEV-1117 & 24 990 & 12 & con\_fallas & REVISION & REVISION\_FALLA \\
+DEV-1125 & 34 990 & 22 & sin\_abrir & RECHAZO & RECHAZO\_PLAZO \\
+DEV-1123 & 39 980 & 15 & danado\_por\_uso & RECHAZO & RECHAZO\_ESTADO \\
+DEV-1122 & 45 990 & 2 & sin\_abrir & REVISION & REVISION\_MONTO \\
+DEV-1115 & 19 990 & 3 & sin\_abrir & APROBACION & APROBACION \\
+DEV-1116 & 69 980 & 5 & abierto\_sin\_uso & REVISION & REVISION\_MONTO \\
+DEV-C02 & 289 990 & 2 & sin\_abrir & APROBACION & APROBACION \\
+DEV-1118 & 79 990 & 4 & sin\_abrir & REVISION & REVISION\_MONTO \\
+DEV-1126 & 79 990 & 8 & con\_fallas & REVISION & REVISION\_MONTO \\
+DEV-C03 & 79 990 & 29 & abierto\_sin\_uso & RECHAZO & RECHAZO\_PLAZO \\
+DEV-1119 & 45 990 & 25 & danado\_por\_uso & RECHAZO & RECHAZO\_PLAZO \\
+DEV-C01 & 9 990 & 1 & sin\_abrir & REVISION & REVISION\_MONTO \\
+DEV-1124 & 49 980 & 1 & abierto\_sin\_uso & REVISION & REVISION\_MONTO \\
+DEV-1121 & 289 990 & 9 & sin\_abrir & APROBACION & APROBACION \\
+DEV-1120 & 89 990 & 2 & con\_fallas & REVISION & REVISION\_MONTO \\
+\bottomrule
+\end{tabularx}
+\caption{Resumen de solicitudes de devolución}
+\end{table}
+
+\noindent Los resultados obtenidos permiten comprobar el comportamiento de las reglas implementadas, identificando las solicitudes que pueden aprobarse automáticamente y aquellas que requieren rechazo o revisión.
+
+\section{Resumen diario de solicitudes}
+
+\noindent Para el desarrollo de la Parte B, se implementó un tercer workflow encargado de generar un resumen diario de las solicitudes procesadas. Para ello, se utilizó un nodo Schedule Trigger, configurado con una frecuencia diaria a las 20:00 horas, con el objetivo de consolidar la información registrada durante la jornada y enviar un único mensaje con la cantidad de solicitudes y el monto total por cada ruta, el monto total del día y la tasa de aprobación automática. Estos indicadores se obtienen mediante el nodo Summarize, a partir de los registros almacenados en la Data Table.
+\\\\
+\noindent En caso de que durante el día no se registren solicitudes, el workflow identifica la ausencia de movimientos mediante un nodo IF y ejecuta una ruta alternativa que genera una notificación indicando que no se procesaron solicitudes durante la jornada. De esta manera, se evita realizar cálculos con registros inexistentes y se mantiene el envío del resumen diario, incluso cuando no existen solicitudes.
+
+\section{Validación y pruebas adicionales}
+
+\subsection{Pruebas de entradas inválidas}
+
+\noindent Para esta parte, se consideran tres solicitudes adicionales para analizar el comportamiento del flujo frente a entradas inválidas.
+\\\\
+\noindent Las pruebas permiten comprobar la respuesta del sistema cuando la información recibida no cumple con las condiciones necesarias
+para procesar correctamente una devolución.
+\\\\
+\noindent En la primera prueba se envió una solicitud sin identificador, mientras que en la segunda se utilizó un monto igual a cero. En ambos casos, se espera que el sistema identifique identifique correctamente los datos inválidos mediante el nodo Switch y dirija las solicitudes hacia la ruta DATOS\_INVALIDOS, resultado que fue obtenido conforme a lo previsto.
+\\\\
+\noindent Entrada enviada n.º 1: Falta el identificador de la solicitud
+\begin{verbatim}
+{
+  "sku": "AU-210",
+  "unidades": "1",
+  "monto": "19990",
+  "dias_desde_compra": "3",
+  "estado_producto": "sin_abrir",
+  "email_cliente": "cliente1@example.cl"
+}
+\end{verbatim}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Prueba_n1.png}
+    \caption{Captura de ejecución de la primera prueba}
+    \label{fig:placeholder}
+\end{figure}
+
+\noindent Entrada enviada n.º 2: Monto igual a cero
+\begin{verbatim}
+{
+  "id_solicitud": "DEV-ERR-02",
+  "sku": "AU-210",
+  "unidades": "1",
+  "monto": "0",
+  "dias_desde_compra": "3",
+  "estado_producto": "sin_abrir",
+  "email_cliente": "cliente1@example.cl"
+}
+\end{verbatim}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Prueba_n2.png}
+    \caption{Captura de ejecución de la segunda prueba}
+    \label{fig:placeholder}
+\end{figure}
+
+\noindent En la tercera prueba se ingresó el valor ''mil'' en el campo monto, con el objetivo de provocar un error de conversión. Lo que se espera que ocurra es que haya un error en el nodo Switch, debido a que este evalúa la condición del monto respecto a un valor numérico y no un string.
+\\\\
+\noindent Entrada enviada n.º 3: Monto no numérico
+\begin{verbatim}
+{
+  "id_solicitud": "DEV-ERR-03",
+  "sku": "AU-210",
+  "unidades": "1",
+  "monto": "mil",
+  "dias_desde_compra": "3",
+  "estado_producto": "sin_abrir",
+  "email_cliente": "cliente1@example.cl"
+}
+\end{verbatim}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Prueba_n3.png}
+    \caption{Captura de ejecución de la tercera prueba}
+    \label{fig:placeholder}
+\end{figure}
+
+Durante la ejecución, el nodo Switch presentó el mensaje ``cannot convert to number'', deteniendo el procesamiento de la solicitud. De esta manera, se comprobó tanto el manejo de entradas inválidas mediante una ruta definida como la respuesta del sistema frente a una falla de ejecución.
+
+\subsection{Error Workflow}
+
+\noindent Respecto al manejo de errores, n8n dispone de tres opciones: Stop Workflow, que detiene la ejecución cuando se produce un error; Continue, que permite continuar el flujo a pesar de la falla; y Continue (using error output), que dirige el error hacia una salida alternativa para su tratamiento. 
+\\\\
+Para las pruebas realizadas se mantuvo la opción Stop Workflow en los nodos principales, con el objetivo de evitar que las solicitudes continuaran procesándose con información incorrecta y permitir la identificación de las fallas durante la ejecución.
+\\\\
+\noindent En los nodos de notificación por correo electrónico se utilizó la opción Continue ante errores, debido a que las direcciones de correo proporcionadas corresponden a datos ficticios utilizados para las pruebas del laboratorio. Esta configuración permite que, en caso de producirse un error durante el envío de una notificación, el workflow continúe con las siguientes actividades, evitando que una falla en el correo impida el registro de la solicitud y la entrega de una respuesta mediante el Webhook.
+\\\\
+\noindent Esta decisión se adoptó exclusivamente para el entorno de pruebas, con el objetivo de comprobar el funcionamiento del proceso sin depender de la existencia de cuentas de correo reales. En un entorno de producción, sería necesario incorporar un mecanismo de notificación y registro de errores que permita identificar los correos no enviados y gestionar posteriormente su reenvío.
+
+\subsection{Casos frontera}
+
+\noindent Las solicitudes originales no consideran casos en los que el monto o los días transcurridos desde la compra sean exactamente iguales a los límites establecidos.
+
+\noindent Por lo tanto, se construyeron dos solicitudes adicionales para comprobar el comportamiento del flujo cuando el monto es exactamente igual a U y cuando los días transcurridos desde la compra son exactamente iguales a D.
+
+\subsubsection{Caso 1: monto exactamente igual a U}
+
+\noindent La regla de revisión por monto establece que una solicitud debe ser enviada a revisión cuando el monto supera el umbral definido, es decir:
+
+\[ monto > 34000 \]
+
+\noindent Como el monto enviado es exactamente igual a \$34.000, no se cumple la condición de revisión por monto. Por lo tanto, considerando
+que las demás condiciones también se encuentran dentro de lo permitido, la solicitud debe clasificarse en la ruta APROBACION.
+
+\begin{verbatim}
+{
+  "id_solicitud": "DEV-LIM-U",
+  "sku": "PL-120",
+  "unidades": "1",
+  "monto": "34000",
+  "dias_desde_compra": "2",
+  "estado_producto": "sin_abrir",
+  "email_cliente": "cliente8@example.cl"
+}
+\end{verbatim}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Monto_exacto.png}
+    \caption{Captura de ejecución del primer caso frontera}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsubsection{Caso 2: días exactamente iguales a D}
+
+\noindent La regla de rechazo por plazo establece que una solicitud debe rechazarse cuando los días transcurridos desde la compra superan el plazo máximo permitido:
+
+\[ dias_{\text{desde compra}} > 21 \]
+
+\noindent Como la solicitud se realiza exactamente a los 21 días, la condición de rechazo por plazo no se cumple.
+
+\noindent En consecuencia, considerando que el monto y el estado del producto también cumplen con las condiciones establecidas, la solicitud debe continuar por la ruta APROBACION.
+
+\begin{verbatim}
+{
+  "id_solicitud": "DEV-LIM-D",
+  "sku": "PL-120",
+  "unidades": "1",
+  "monto": "9990",
+  "dias_desde_compra": "21",
+  "estado_producto": "sin_abrir",
+  "email_cliente": "cliente8@example.cl"
+}
+\end{verbatim}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Dias_exactos.png}
+    \caption{Captura de ejecución del segundo caso frontera}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsection{Error a propósito}
+
+\noindent Para analizar el efecto del tipo de dato utilizado en las comparaciones, se modificó temporalmente la condición de revisión por monto del nodo Switch, cambiando su tipo de Number a String.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Comando_switch.png}
+    \caption{Captura donde se modificó temporalmente la condición de revisión por monto}
+    \label{fig:placeholder}
+\end{figure}
+
+\noindent Posteriormente, se envió nuevamente la solicitud DEV-C01, cuyo monto corresponde a \$9.990.
+\\\\
+\noindent Al comparar los montos como texto, se evalúan sus caracteres y no su valor numérico, por lo que ``9990'' resulta mayor que ``34000'' al comenzar con 9 y 3, respectivamente. Esto provoca que la solicitud sea clasificada como REVISION\_MONTO, pese a que su monto real es inferior al umbral establecido.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Error_a_proposito.png}
+    \caption{Captura de ejecución del caso con error de tipo provocado}
+    \label{fig:placeholder}
+\end{figure}
+
+\noindent
+Este comportamiento demuestra la importancia de utilizar el tipo de dato adecuado durante la evaluación de las reglas,ya que una comparación textual puede generar una clasificación incorrecta sin que necesariamente se produzca un error durante la ejecución del flujo.
+
+\subsection{Casos que el flujo no puede resolver}
+
+\noindent Para identificar las limitaciones de las validaciones implementadas, se construyeron dos solicitudes adicionales.
+
+\subsubsection{Caso 1: monto expresado como texto}
+
+\noindent Se envió una solicitud utilizando el texto ``veinte mil'' en el campo correspondiente al monto, manteniendo los demás datos dentro de las condiciones establecidas.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Veinte_mil.png}
+    \caption{Captura de ejecución con monto expresado como texto}
+    \label{fig:placeholder}
+\end{figure}
+
+\noindent El monto expresado como texto no numérico provoca un error al intentar convertirlo a número. Esto ocurre porque el flujo no valida previamente su formato, por lo que se requiere una validación que clasifique estos casos como datos inválidos.
+
+\subsubsection{Caso 2: solicitud con SKU inexistente}
+
+\noindent Para la segunda prueba se envió una solicitud utilizando el SKU ZZ-999, el cual no corresponde a un producto existente en el catálogo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Sku_inexistente.png}
+    \caption{Captura de ejecución de solicitud con SKU inexistente}
+    \label{fig:placeholder}
+\end{figure}
+
+La solicitud con SKU ZZ-999 se clasifica como aprobada porque el flujo no verifica su existencia en el catálogo. Para evitarlo, se requiere incorporar una validación que detecte los SKU inexistentes antes de clasificar la solicitud.
+
+\section{Conclusiones}
+
+\noindent El desarrollo del laboratorio permitió implementar un flujo automatizado para la recepción y clasificación de solicitudes de devolución, utilizando las herramientas disponibles en n8n.
+\\\\
+\noindent La configuración de las reglas de negocio permite establecer distintos caminos para las solicitudes, considerando las condiciones asociadas al monto, el plazo y el estado del producto.
+\\\\
+\noindent Las pruebas adicionales permiten identificar aspectos que deben considerarse para mejorar el funcionamiento del sistema, principalmente en relación con la validación de los tipos de datos y la comprobación de la existencia de los productos.
+\\\\
+\noindent En consecuencia, si bien el flujo desarrollado permite automatizar la clasificación de las solicitudes de acuerdo con las reglas implementadas, sería necesario incorporar validaciones adicionales y mecanismos de control de errores antes de utilizarlo como un sistema definitivo.
+
+\end{document}
