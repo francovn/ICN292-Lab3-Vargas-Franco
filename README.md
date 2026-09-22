@@ -20,15 +20,15 @@ Adicionalmente, se realizaron pruebas para verificar el funcionamiento de las re
 
 - `ICN292-Lab3-Vargas-Franco.pdf`                    |  Informe del laboratorio con el desarrollo, los resultados y las conclusiones.                
 - `ICN292-Lab3-Vargas-Franco.tex`                    |  Código fuente LaTeX del informe.                                                             
-- `workflows/ICN292-Lab3-Vargas-Franco-triage.json`  |  Workflow principal encargado de recibir, evaluar y clasificar las solicitudes de devolución. 
-- `workflows/ICN292-Lab3-Vargas-Franco-emisor.json`  |  Workflow encargado de enviar las solicitudes de prueba al flujo principal.                   
-- `workflows/ICN292-Lab3-Vargas-Franco-resume.json`  |  Workflow encargado de generar el resumen diario de las solicitudes procesadas.               
+- `Workflows/ICN292-Lab3-Vargas-Franco-triage.json`  |  Workflow principal encargado de recibir, evaluar y clasificar las solicitudes de devolución. 
+- `Workflows/ICN292-Lab3-Vargas-Franco-emisor.json`  |  Workflow encargado de enviar las solicitudes de prueba al flujo principal.                   
+- `Workflows/ICN292-Lab3-Vargas-Franco-resume.json`  |  Workflow encargado de generar el resumen diario de las solicitudes procesadas.               
 - `Capturas/`                                        |  Capturas de pantalla de los workflows y de las pruebas realizadas.                                               
 ## Instrucciones de ejecución
 
-Para reproducir el laboratorio, se debe acceder a la plataforma n8n e importar los archivos `.json` disponibles en la carpeta `workflows`.
+Para reproducir el laboratorio, se debe acceder a la plataforma n8n e importar los archivos `.json` disponibles en la carpeta `Workflows`.
 Posteriormente, se deben configurar las conexiones utilizados en el flujo principal, junto con el Webhook correspondiente.
 Una vez configurados los workflows, se debe ejecutar el flujo *triage* y enviar las solicitudes mediante *emisor*.
 Finalmente, se puede ejecutar el workflow *resumen* para generar los indicadores correspondientes a las solicitudes registradas.
-Las evidencias de ejecución y los resultados obtenidos se encuentran disponibles en el informe y en la carpeta `evidencias/`.
+Las evidencias de ejecución y los resultados obtenidos se encuentran disponibles en el informe y en la carpeta `Capturas/`.
 
